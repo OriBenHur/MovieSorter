@@ -44,7 +44,6 @@ function TestWord($arg , $Filter)
             $bool = $false
             break
         }
-
     }
     return $bool
 }
@@ -58,8 +57,7 @@ foreach ($file in $FileList)
 {
     $baseDir = Split-Path $file -Parent
     if(-not($MatchFiles.Contains($baseDir)))
-    {
-        
+    { 
         $ext = [IO.Path]::GetExtension($file)
         if(($ext -eq ".mp4") -or ($ext -eq ".avi") -or ($ext -eq ".mkv"))
         { 
