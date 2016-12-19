@@ -59,11 +59,10 @@ foreach ($file in $FileList)
     $baseDir = Split-Path $file -Parent
     if(-not($MatchFiles.Contains($baseDir)))
     {
-        
         $ext = [IO.Path]::GetExtension($file)
         if(($ext -eq ".mp4") -or ($ext -eq ".avi") -or ($ext -eq ".mkv"))
         { 
-            $count++  
+            #$count++  
             $Name = Split-Path -Path "$file" -Leaf -Resolve
             $Name = [System.IO.Path]::GetFileNameWithoutExtension($Name)
             $SP =  "[sS][0-9]{2}[eE][0-9]{2}"
@@ -139,6 +138,6 @@ foreach ($file in $FileList)
         }
     }
 }
-$count
+#$count
 $MatchFiles
 #####################################################################################################
