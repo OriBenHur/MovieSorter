@@ -15,7 +15,8 @@ $IgnoreList = @()
 $Rips  = "CAMRip","CAM","TS","TELESYNC","PDVD","WP","WORKPRINT","TC","TELECINE","PPV","PPVRip","SCR","SCREENER","DVDSCR",`
 "DVDSCREENER","BDSCR","DDC","R5","R5.LINE","R5.AC3.5.1.HQ","DVDRip","DVDR","DVD-Full","Full-Rip","ISO rip","DVD-5","DVD-9",`
 "DSR","DSRip","SATRip","DTHRip","DVBRip","HDTV","PDTV","TVRip","VODRip","VODR","WEBDL","WEB DL","WEB-DL","WEB","HDRip","WEB-Rip",`
-"WEBRIP","WEB Rip","HDRip","WEB-Cap","WEBCAP","WEB Cap","BDRip","BRRip","Blu-Ray","BluRay","BLURAY","BDR","BD5","BD9","BD25","BD50"
+"WEBRIP","WEB Rip","HDRip","WEB-Cap","WEBCAP","WEB Cap","BDRip","BRRip","Blu-Ray","BluRay","BLURAY","BDR","BD5","BD9","BD25","BD50",`
+"420p","480i","720p","1080p","1080i"
 #####################################################################################################
 
 
@@ -70,6 +71,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                 $SP =  "[sS][0-9]{2}[eE][0-9]{2}"
                 if($Name -match $SP)
                 {
+                    $Name
                     $Name -match "[sS][0-9]{2}" >$null
                     $S = $matches[0]
                     $S = $S.trim("S"," ")
@@ -86,7 +88,6 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     #write-host $API"?t=$Name&Season=$S&Episode=$E&r=json"
                     $Movie = $Movie.Content
                     $Movie = $Movie | ConvertFrom-Json
-                    $Movie
                     foreach ($item in $Movie) 
                     {
                         if($item.Year -eq "2016")
@@ -139,6 +140,6 @@ if($FolderBrowser.ShowDialog() -eq "OK")
         }
     }
 }
-#$count
+$count
 $MatchFiles
 #####################################################################################################
