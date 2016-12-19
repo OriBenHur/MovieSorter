@@ -86,6 +86,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     #write-host $API"?t=$Name&Season=$S&Episode=$E&r=json"
                     $Movie = $Movie.Content
                     $Movie = $Movie | ConvertFrom-Json
+                    $Movie
                     foreach ($item in $Movie) 
                     {
                         if($item.Year -eq "2016")
