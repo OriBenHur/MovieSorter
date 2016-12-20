@@ -1,10 +1,10 @@
-param($Work)
+<#param($Work)
 
 # restart PowerShell with -noexit, the same script, and 1
 if (!$Work) {
     powershell -executionpolicy remotesigned -noexit -file $MyInvocation.MyCommand.Path 1
     return
-}
+}#>
 
 ##################################### Setting Initial Variables #####################################
 $RootFolder = Split-Path -Parent ($MyInvocation.MyCommand.Path) 
@@ -12,7 +12,7 @@ $ErrorActionPreference = "SilentlyContinue"
 $API = "http://www.omdbapi.com/"
 $MatchFiles = @()
 $IgnoreList = @()
-$Rips  = "CAMRip","CAM","TS","TELESYNC","PDVD","WP","WORKPRINT","TC","TELECINE","PPV","PPVRip","SCR","SCREENER","DVDSCR",`
+$Rips = "CAMRip","CAM","TS","TELESYNC","PDVD","WP","WORKPRINT","TC","TELECINE","PPV","PPVRip","SCR","SCREENER","DVDSCR",`
 "DVDSCREENER","BDSCR","DDC","R5","R5.LINE","R5.AC3.5.1.HQ","DVDRip","DVDR","DVD-Full","Full-Rip","ISO rip","DVD-5","DVD-9",`
 "DSR","DSRip","SATRip","DTHRip","DVBRip","HDTV","PDTV","TVRip","VODRip","VODR","WEBDL","WEB DL","WEB-DL","WEB","HDRip","WEB-Rip",`
 "WEBRIP","WEB Rip","HDRip","WEB-Cap","WEBCAP","WEB Cap","BDRip","BRRip","Blu-Ray","BluRay","BLURAY","BDR","BD5","BD9","BD25","BD50",`
@@ -75,7 +75,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
     $Dir = $FolderBrowser.SelectedPath
     $FileList = Get-ChildItem -Path "$Dir" -Recurse | ForEach-Object{ $_.FullName }
     foreach ($file in $FileList)
-    {
+    {  
         $baseDir = Split-Path $file -Parent
         $Matches = @()
 
@@ -84,7 +84,6 @@ if($FolderBrowser.ShowDialog() -eq "OK")
             $ext = [IO.Path]::GetExtension($file)
             if(($ext -eq ".mp4") -or ($ext -eq ".avi") -or ($ext -eq ".mkv"))
             { 
-                #$count++  
                 $Name = Split-Path -Path "$file" -Leaf -Resolve
                 $Name = [System.IO.Path]::GetFileNameWithoutExtension($Name)
                 $SP =  "[sS][0-9]{2}[eE][0-9]{2}"
@@ -97,18 +96,17 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     $Name = $Name -split $SP
                     $Name = $Name[0]
                     $Name = $Name.Substring(0,$Name.length-1)
-                    #cmd.exe /c pause
-                    $Movie = Invoke-WebRequest $API"?t=$Name&Season=$S&r=json"
-                    #write-host $API"?t=$Name&Season=$S&r=json"
+                    $URI = $API+"?t=$Name&Season=$S&r=json"
+                    $Movie = Invoke-WebRequest $URI
+                    #Write-Host $URI
                     $Movie = $Movie.Content
-                    #$Movie = $Movie.Substring($Movie.indexof("["),$Movie.indexof("]")-73)
                     $Movie = $Movie | ConvertFrom-Json
                     if(TVShowCheckYear $Movie ){ $MatchFiles += $baseDir }
                     else{ $IgnoreList += $baseDir }
                 }
                 
                 else
-                {        
+                {
                     $MP = '[0-9]{4}'
                     $Name -match $MP>$null
                     [int]$Year = $Matches[0]
@@ -117,6 +115,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                         if($Year -eq "2016") { $MatchFiles+=$baseDir }
                         else {$IgnoreList += $baseDir}
                     }
+                    
                     else
                     {
                         $TMP =  $Name -split "\."
@@ -127,8 +126,9 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                             else { Break }
                         }
                         $Name = $Name.Substring(0,$Name.length-1)
-                        $Movie = Invoke-WebRequest $API"?s=$Name&type=movie&$Data=json"
-                        #write-host "$API$FileTitle=$Name&type=movie&$Data=json"
+                        $URI = $API+"?s=$Name&type=movie&$Data=json"
+                        $Movie = Invoke-WebRequest $URI
+                        #Write-Host $URI
                         $Movie = $Movie.Content
                         $Movie = $Movie.Substring($Movie.indexof("["),$Movie.indexof("]")-9)
                         $Movie = $Movie | ConvertFrom-Json
