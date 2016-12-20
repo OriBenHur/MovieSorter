@@ -53,19 +53,17 @@ function TestWord($arg , $Filter)
 ############################### Declaring TVShow Year Check  Function ###############################
 function TVShowCheckYear($Show)
 {
-    $bool = $false
     foreach($Episode in $Show.Episodes)
     {
         if($Show.Episodes -ne $null)
         {
             if($Episode.Released -match "2016")
             {
-                $bool = $true
-                break
+                return $true
             }
         }
     }
-    return $bool
+    return $false
 }
 #####################################################################################################
 
