@@ -51,18 +51,22 @@ function TestWord($arg , $Filter)
 
 
 ############################### Declaring TVShow Year Check  Function ###############################
-<#function TVShowCheckYear($Show)
+function TVShowCheckYear($Show)
 {
     $bool = $false
-    foreach($Episode in $Sowh)
+    foreach($Episode in $Show.Episodes)
     {
-        if($Episode.Released -match "2016")
+        if($Show.Episodes -ne $null)
         {
-            $bool = $true
+            if($Episode.Released -match "2016")
+            {
+                $bool = $true
+                break
+            }
         }
     }
     return $bool
-}#>
+}
 
 
 ############################################### Work ################################################
@@ -99,19 +103,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     $Movie = $Movie.Content
                     #$Movie = $Movie.Substring($Movie.indexof("["),$Movie.indexof("]")-73)
                     $Movie = $Movie | ConvertFrom-Json
-                    $bool = $false
-                    foreach($Episode in $Movie.Episodes)
-                    {
-                        if($Movie.Episodes -ne $null)
-                        {
-                            if($Episode.Released -match "2016")
-                            {
-                                $bool = $true
-                                break
-                            }
-                        }
-                    }
-                    if($bool){ $MatchFiles += $baseDir }
+                    if(TVShowCheckYear $Movie ){ $MatchFiles += $baseDir }
                     else{ $IgnoreList += $baseDir }
                 }
                 
