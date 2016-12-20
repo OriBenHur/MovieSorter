@@ -50,6 +50,21 @@ function TestWord($arg , $Filter)
 
 
 
+############################### Declaring TVShow Year Check  Function ###############################
+<#function TVShowCheckYear($Show)
+{
+    $bool = $false
+    foreach($Episode in $Sowh)
+    {
+        if($Episode.Released -match "2016")
+        {
+            $bool = $true
+        }
+    }
+    return $bool
+}#>
+
+
 ############################################### Work ################################################
 if($FolderBrowser.ShowDialog() -eq "OK")
 {
@@ -71,33 +86,33 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                 $SP =  "[sS][0-9]{2}[eE][0-9]{2}"
                 if($Name -match $SP)
                 {
-                    $Name
+                    $Matches = @()
                     $Name -match "[sS][0-9]{2}" >$null
                     $S = $matches[0]
                     $S = $S.trim("S"," ")
-                    $Matches = @()
-                    $Name -match "[eE][0-9]{2}" >$null
-                    $E = $matches[0]
-                    $E = $E.trim("E"," ")
-                    $FileTitle ="t"
                     $Name = $Name -split $SP
                     $Name = $Name[0]
                     $Name = $Name.Substring(0,$Name.length-1)
                     #cmd.exe /c pause
-                    $Movie = Invoke-WebRequest $API"?t=$Name&Season=$S&Episode=$E&r=json"
-                    #write-host $API"?t=$Name&Season=$S&Episode=$E&r=json"
+                    $Movie = Invoke-WebRequest $API"?t=$Name&Season=$S&r=json"
+                    #write-host $API"?t=$Name&Season=$S&r=json"
                     $Movie = $Movie.Content
+                    #$Movie = $Movie.Substring($Movie.indexof("["),$Movie.indexof("]")-73)
                     $Movie = $Movie | ConvertFrom-Json
-                    foreach ($item in $Movie) 
+                    $bool = $false
+                    foreach($Episode in $Movie.Episodes)
                     {
-                        if($item.Year -eq "2016")
+                        if($Movie.Episodes -ne $null)
                         {
-                            if($item.Type -eq "episode"){ $MatchFiles+=$baseDir }
-                            else {$IgnoreList += $baseDir}
+                            if($Episode.Released -match "2016")
+                            {
+                                $bool = $true
+                                break
+                            }
                         }
-                        else {$IgnoreList += $baseDir}
-                        
                     }
+                    if($bool){ $MatchFiles += $baseDir }
+                    else{ $IgnoreList += $baseDir }
                 }
                 
                 else
@@ -130,7 +145,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                         {
                             if(($item.Title -eq $Name) -and ($item.Type -eq "movie"))
                             {
-                                if($item.Year -eq "2016") { $MatchFiles+=$baseDir }
+                                if($item.Year -eq "2016") { $MatchFiles += $baseDir }
                                 else {$IgnoreList += $baseDir}
                             } 
                         }
