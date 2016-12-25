@@ -1,17 +1,17 @@
-param($Work)
+<#param($Work)
 
 # restart PowerShell with -noexit, the same script, and 1
 if (!$Work) {
     powershell -executionpolicy remotesigned -noexit -file $MyInvocation.MyCommand.Path 1
     return
 }
-
+#>
 ##################################### Setting Initial Variables #####################################
 $RootFolder = Split-Path -Parent ($MyInvocation.MyCommand.Path) 
 $ErrorActionPreference = "SilentlyContinue"
 $API = "http://www.omdbapi.com/"
 $MatchFiles = @()
-$IgnoreList = @()
+#$IgnoreList = @()
 $Rips = "CAMRip","CAM","TS","TELESYNC","PDVD","WP","WORKPRINT","TC","TELECINE","PPV","PPVRip","SCR","SCREENER","DVDSCR",`
 "DVDSCREENER","BDSCR","DDC","R5","R5.LINE","R5.AC3.5.1.HQ","DVDRip","DVDR","DVD-Full","Full-Rip","ISO rip","DVD-5","DVD-9",`
 "DSR","DSRip","SATRip","DTHRip","DVBRip","HDTV","PDTV","TVRip","VODRip","VODR","WEBDL","WEB DL","WEB-DL","WEB","HDRip","WEB-Rip",`
@@ -76,10 +76,10 @@ if($FolderBrowser.ShowDialog() -eq "OK")
     $FileList = Get-ChildItem -Path "$Dir" -Recurse | ForEach-Object{ $_.FullName }
     foreach ($file in $FileList)
     {  
-        $baseDir = Split-Path $file -Parent
+        #$baseDir = Split-Path $file -Parent
         $Matches = @()
 
-        if((-not $MatchFiles.Contains($baseDir)) -and -not ($IgnoreList.Contains($baseDir))-and -not ((Get-Item $file) -is [System.IO.DirectoryInfo]))
+        if((-not $MatchFiles.Contains($file)) -and -not ((Get-Item $file) -is [System.IO.DirectoryInfo]))
         { 
             $ext = [IO.Path]::GetExtension($file)
             if(($ext -eq ".mp4") -or ($ext -eq ".avi") -or ($ext -eq ".mkv"))
@@ -101,8 +101,8 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     #Write-Host $URI
                     $Movie = $Movie.Content
                     $Movie = $Movie | ConvertFrom-Json
-                    if(TVShowCheckYear $Movie ){ $MatchFiles += $baseDir }
-                    else{ $IgnoreList += $baseDir }
+                    if(TVShowCheckYear $Movie ){ $MatchFiles += $file }
+                    #else{ $IgnoreList += $baseDir }
                 }
                 
                 else
@@ -112,8 +112,8 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     [int]$Year = $Matches[0]
                     if(($Year -ne $null) -and ($Year -ge "1900"))
                     {  
-                        if($Year -eq "2016") { $MatchFiles+=$baseDir }
-                        else {$IgnoreList += $baseDir}
+                        if($Year -eq "2016") { $MatchFiles += $file }
+                        #else {$IgnoreList += $baseDir}
                     }
                     
                     else
@@ -137,8 +137,8 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                         {
                             if(($item.Title -eq $Name) -and ($item.Type -eq "movie"))
                             {
-                                if($item.Year -eq "2016") { $MatchFiles += $baseDir }
-                                else {$IgnoreList += $baseDir}
+                                if($item.Year -eq "2016") { $MatchFiles += $file }
+                                #else {$IgnoreList += $baseDir}
                             } 
                         }
                     }
