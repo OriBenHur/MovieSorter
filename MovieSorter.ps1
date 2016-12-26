@@ -11,7 +11,8 @@ $RootFolder = Split-Path -Parent ($MyInvocation.MyCommand.Path)
 $ErrorActionPreference = "SilentlyContinue"
 $API = "http://www.omdbapi.com/"
 $MatchFiles = @()
-#$IgnoreList = @()
+$IgnoreList = @()
+$EP_Year = "2016"
 $Filters = "CAMRip|CAM|TS|TELESYNC|PDVD|PTVD|PPVRip|SCR|SCREENER|DVDSCR|DVDSCREENER|BDSCR|R4|R5|R5LINE|R5.LINE|DVD|DVD5|DVD9|DVDRip|DVDR|TVRip|DSR|PDTV|SDTV|HDTV|HDTVRip|DVB|DVBRip|DTHRip|VODRip|VODR|BDRip|BRRip|BR.Rip|BluRay|Blu.Ray|BD|BDR|BD25|BD50|3D.BluRay|3DBluRay|3DBD|Remux|BDRemux|BR.Scr|BR.Screener|HDDVD|HDRip|WorkPrint|VHS|VCD|TELECINE|WEBRip|WEB.Rip|WEBDL|WEB.DL|WEBCap|WEB.Cap|ithd|iTunesHD|Laserdisc|AmazonHD|NetflixHD|NetflixUHD|VHSRip|LaserRip|URip|UnknownRip|MicroHD|WP|TC|PPV|DDC|R5.AC3.5.1.HQ|DVD-Full|DVDFull|Full-Rip|FullRip|DSRip|SATRip|BD5|BD9|Extended|Uncensored|Remastered|Unrated|Uncut|IMAX|(Ultimate.)?(Director.?s|Theatrical|Ultimate|Final|Rogue|Collectors|Special|Despecialized).(Cut|Edition|Version)|((H|HALF|F|FULL)[^\\p{Alnum}]{0,2})?(SBS|TAB|OU)|DivX|Xvid|AVC|(x|h)[.]?(264|265)|HEVC|3ivx|PGS|MP[E]?G[45]?|MP[34]|(FLAC|AAC|AC3|DD|MA).?[2457][.]?[01]|[26]ch|(Multi.)?DTS(.HD)?(.MA)?|FLAC|AAC|AC3|TrueHD|Atmos|[M0]?(420|480|720|1080|1440|2160)[pi]|(?<=[-.])(420|480|720|1080|2D|3D)|10.?bit|(24|30|60)FPS|Hi10[P]?|[a-z]{2,3}.(2[.]0|5[.]1)|(19|20)[0-9]+(.)S[0-9]+(?!(.)?E[0-9]+)|(?<=\\d+)v[0-4]|CD\\d+|3D|2D"
 #####################################################################################################
 
@@ -44,13 +45,13 @@ function TestWord($arg , $Filter)
 
 
 ############################### Declaring TVShow Year Check  Function ###############################
-function TVShowCheckYear($Show)
+function TVShowCheckYear($Show , $EPYear)
 {
     foreach($Episode in $Show.Episodes)
     {
         if($Show.Episodes -ne $null)
         {
-            if($Episode.Released -match "2016")
+            if($Episode.Released -match $EPYear)
             {
                 return $true
             }
@@ -69,10 +70,10 @@ if($FolderBrowser.ShowDialog() -eq "OK")
     $FileList = Get-ChildItem -Path "$Dir" -Recurse | ForEach-Object{ $_.FullName }
     foreach ($file in $FileList)
     {  
-        #$baseDir = Split-Path $file -Parent
+        $baseDir = Split-Path $file -Parent
         $Matches = @()
 
-        if((-not $MatchFiles.Contains($file)) -and -not ((Get-Item $file) -is [System.IO.DirectoryInfo]))
+        if((-not $MatchFiles.Contains($file)) -and -not ((Get-Item $file) -is [System.IO.DirectoryInfo]) -and (-not $MatchFiles.Contains($baseDir)) -and (-not $IgnoreList.Contains($baseDir)))
         { 
             $ext = [IO.Path]::GetExtension($file)
             if(($ext -eq ".mp4") -or ($ext -eq ".avi") -or ($ext -eq ".mkv"))
@@ -94,8 +95,8 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     #Write-Host $URI
                     $Movie = $Movie.Content
                     $Movie = $Movie | ConvertFrom-Json
-                    if(TVShowCheckYear $Movie ){ $MatchFiles += $file }
-                    #else{ $IgnoreList += $baseDir }
+                    if(TVShowCheckYear $Movie $EP_Year ){ $MatchFiles += $baseDir }
+                    else{ $IgnoreList += $baseDir }
                 }
                 
                 else
@@ -103,7 +104,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     $MP = '[0-9]{4}'
                     $Name -match $MP>$null
                     [int]$Year = $Matches[0]
-                    if(($Year -ne $null) -and ($Year -ge 1900)-and ($Year -lt 2100))
+                    if(($Year -ne $null) -and ($Year -ge 1900) -and ($Year -lt 2100))
                     {  
                         if($Year -eq "2016") { $MatchFiles += $file }
                         #else {$IgnoreList += $baseDir}
