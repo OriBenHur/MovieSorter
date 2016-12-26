@@ -12,11 +12,7 @@ $ErrorActionPreference = "SilentlyContinue"
 $API = "http://www.omdbapi.com/"
 $MatchFiles = @()
 #$IgnoreList = @()
-$Rips = "CAMRip","CAM","TS","TELESYNC","PDVD","WP","WORKPRINT","TC","TELECINE","PPV","PPVRip","SCR","SCREENER","DVDSCR",`
-"DVDSCREENER","BDSCR","DDC","R5","R5.LINE","R5.AC3.5.1.HQ","DVDRip","DVDR","DVD-Full","Full-Rip","ISO rip","DVD-5","DVD-9",`
-"DSR","DSRip","SATRip","DTHRip","DVBRip","HDTV","PDTV","TVRip","VODRip","VODR","WEBDL","WEB DL","WEB-DL","WEB","HDRip","WEB-Rip",`
-"WEBRIP","WEB Rip","HDRip","WEB-Cap","WEBCAP","WEB Cap","BDRip","BRRip","Blu-Ray","BluRay","BLURAY","BDR","BD5","BD9","BD25","BD50",`
-"420p","480i","720p","1080p","1080i"
+$Filters = "CAMRip|CAM|TS|TELESYNC|PDVD|PTVD|PPVRip|SCR|SCREENER|DVDSCR|DVDSCREENER|BDSCR|R4|R5|R5LINE|R5.LINE|DVD|DVD5|DVD9|DVDRip|DVDR|TVRip|DSR|PDTV|SDTV|HDTV|HDTVRip|DVB|DVBRip|DTHRip|VODRip|VODR|BDRip|BRRip|BR.Rip|BluRay|Blu.Ray|BD|BDR|BD25|BD50|3D.BluRay|3DBluRay|3DBD|Remux|BDRemux|BR.Scr|BR.Screener|HDDVD|HDRip|WorkPrint|VHS|VCD|TELECINE|WEBRip|WEB.Rip|WEBDL|WEB.DL|WEBCap|WEB.Cap|ithd|iTunesHD|Laserdisc|AmazonHD|NetflixHD|NetflixUHD|VHSRip|LaserRip|URip|UnknownRip|MicroHD|WP|TC|PPV|DDC|R5.AC3.5.1.HQ|DVD-Full|DVDFull|Full-Rip|FullRip|DSRip|SATRip|BD5|BD9|Extended|Uncensored|Remastered|Unrated|Uncut|IMAX|(Ultimate.)?(Director.?s|Theatrical|Ultimate|Final|Rogue|Collectors|Special|Despecialized).(Cut|Edition|Version)|((H|HALF|F|FULL)[^\\p{Alnum}]{0,2})?(SBS|TAB|OU)|DivX|Xvid|AVC|(x|h)[.]?(264|265)|HEVC|3ivx|PGS|MP[E]?G[45]?|MP[34]|(FLAC|AAC|AC3|DD|MA).?[2457][.]?[01]|[26]ch|(Multi.)?DTS(.HD)?(.MA)?|FLAC|AAC|AC3|TrueHD|Atmos|[M0]?(420|480|720|1080|1440|2160)[pi]|(?<=[-.])(420|480|720|1080|2D|3D)|10.?bit|(24|30|60)FPS|Hi10[P]?|[a-z]{2,3}.(2[.]0|5[.]1)|(19|20)[0-9]+(.)S[0-9]+(?!(.)?E[0-9]+)|(?<=\\d+)v[0-4]|CD\\d+|3D|2D"
 #####################################################################################################
 
 
@@ -36,13 +32,10 @@ $FolderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog -Property @
 function TestWord($arg , $Filter)
 {
     $bool = $true
-    foreach ($item in $filter)
+    if($arg -match $Filter)
     {
-        if($arg -eq $item)
-        {
-            $bool = $false
-            break
-        }
+        $bool = $false
+        break
     }
     return $bool
 }
@@ -110,7 +103,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                     $MP = '[0-9]{4}'
                     $Name -match $MP>$null
                     [int]$Year = $Matches[0]
-                    if(($Year -ne $null) -and ($Year -ge "1900"))
+                    if(($Year -ne $null) -and ($Year -ge 1900)-and ($Year -lt 2100))
                     {  
                         if($Year -eq "2016") { $MatchFiles += $file }
                         #else {$IgnoreList += $baseDir}
@@ -122,7 +115,7 @@ if($FolderBrowser.ShowDialog() -eq "OK")
                         $Name = ""
                         foreach($word in $TMP)
                         {
-                            if(TestWord $word $Rips){ $Name += $word+'.'}
+                            if(TestWord $word $Filters){ $Name += $word+'.'}
                             else { Break }
                         }
                         $Name = $Name.Substring(0,$Name.length-1)
